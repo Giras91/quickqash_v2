@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common thermal printer vendors -->
+    
+    <!-- Epson -->
+    <usb-device vendor-id="1208" />
+    
+    <!-- Star Micronics -->
+    <usb-device vendor-id="1305" />
+    
+    <!-- Bixolon -->
+    <usb-device vendor-id="5380" />
+    
+    <!-- Citizen -->
+    <usb-device vendor-id="2655" />
+    
+    <!-- Generic ESC/POS printers (USB printer class) -->
+    <usb-device class="7" />
+</resources>
