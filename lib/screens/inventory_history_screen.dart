@@ -3,6 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../repositories/repositories.dart';
 
+// Family providers for date-range based queries
+final inventoryLogsProvider = FutureProvider.family<List<dynamic>, (DateTime, DateTime)>((ref, dates) async {
+  final repo = ref.watch(inventoryRepositoryProvider);
+  return repo.getLogsByDateRange(dates.$1, dates.$2);
+});
+
+final inventorySummaryProvider = FutureProvider.family<Map<String, double>, (DateTime, DateTime)>((ref, dates) async {
+  final repo = ref.watch(inventoryRepositoryProvider);
+  return repo.getMovementSummaryByReason(dates.$1, dates.$2);
+});
+
 class InventoryHistoryScreen extends ConsumerStatefulWidget {
   final int itemId;
   final String itemName;
@@ -37,17 +48,11 @@ class InventoryHistoryScreenState extends ConsumerState<InventoryHistoryScreen> 
 
   Widget _buildContent(BuildContext context) {
     final logsAsync = ref.watch(
-      FutureProvider<dynamic>((ref) async {
-        final repo = ref.watch(inventoryRepositoryProvider);
-        return repo.getLogsByDateRange(_dateRange.start, _dateRange.end);
-      }),
+      inventoryLogsProvider((_dateRange.start, _dateRange.end)),
     );
 
     final summaryAsync = ref.watch(
-      FutureProvider<dynamic>((ref) async {
-        final repo = ref.watch(inventoryRepositoryProvider);
-        return repo.getMovementSummaryByReason(_dateRange.start, _dateRange.end);
-      }),
+      inventorySummaryProvider((_dateRange.start, _dateRange.end)),
     );
 
     return Scaffold(
@@ -84,6 +89,7 @@ class InventoryHistoryScreenState extends ConsumerState<InventoryHistoryScreen> 
             summaryAsync.when(
               data: (summary) => _buildSummary(context, summary),
               loading: () => const SizedBox.shrink(),
+              // ignore: unnecessary_underscores
               error: (_, __) => const SizedBox.shrink(),
             ),
             // Logs

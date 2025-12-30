@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/printer.dart';
-import '../../repositories/isar_provider.dart';
+import '../../repositories/repositories.dart';
 import '../../services/printer_discovery_service.dart';
 
 class PrinterFormScreen extends ConsumerStatefulWidget {
@@ -45,23 +45,27 @@ class _PrinterFormScreenState extends ConsumerState<PrinterFormScreen> {
   Future<void> _initializeForm() async {
     // If editing existing printer, load its data
     if (widget.printerId != null) {
-      final isar = await ref.read(isarProvider.future);
-      final printer = await isar.printers.get(widget.printerId!);
-      if (printer != null && mounted) {
-        _nameController.text = printer.name;
-        _connectionType = printer.connectionType;
-        _printerType = printer.type;
-        _paperSize = printer.paperSize;
-        _isActive = printer.isActive;
+      try {
+        final repo = ref.read(printerRepositoryProvider);
+        final printer = await repo.getById(widget.printerId!);
+        if (printer != null && mounted) {
+          _nameController.text = printer.name;
+          _connectionType = printer.connectionType;
+          _printerType = printer.type;
+          _paperSize = printer.paperSize;
+          _isActive = printer.isActive;
 
-        _hostController.text = printer.host ?? '';
-        _portController.text = printer.port?.toString() ?? '9100';
-        _bluetoothAddressController.text = printer.bluetoothAddress ?? '';
-        _bluetoothNameController.text = printer.bluetoothName ?? '';
-        _usbVendorIdController.text = printer.usbVendorId?.toString() ?? '';
-        _usbProductIdController.text = printer.usbProductId?.toString() ?? '';
+          _hostController.text = printer.host ?? '';
+          _portController.text = printer.port?.toString() ?? '9100';
+          _bluetoothAddressController.text = printer.bluetoothAddress ?? '';
+          _bluetoothNameController.text = printer.bluetoothName ?? '';
+          _usbVendorIdController.text = printer.usbVendorId?.toString() ?? '';
+          _usbProductIdController.text = printer.usbProductId?.toString() ?? '';
 
-        setState(() {});
+          setState(() {});
+        }
+      } catch (e) {
+        debugPrint('Error loading printer: $e');
       }
     }
     // If adding from discovered device, pre-fill data
@@ -100,6 +104,8 @@ class _PrinterFormScreenState extends ConsumerState<PrinterFormScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final repo = ref.read(printerRepositoryProvider);
+      
       final printer = Printer()
         ..name = _nameController.text.trim()
         ..connectionType = _connectionType
@@ -131,10 +137,7 @@ class _PrinterFormScreenState extends ConsumerState<PrinterFormScreen> {
         printer.id = widget.printerId!;
       }
 
-      final isar = await ref.read(isarProvider.future);
-      await isar.writeTxn(() async {
-        await isar.printers.put(printer);
-      });
+      await repo.save(printer);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

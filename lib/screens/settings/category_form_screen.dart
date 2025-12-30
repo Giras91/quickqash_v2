@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/category.dart';
-import '../../repositories/isar_provider.dart';
 import '../../repositories/repositories.dart';
 
 class CategoryFormScreen extends ConsumerStatefulWidget {
@@ -70,14 +69,18 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
   Future<void> _loadCategory() async {
     if (widget.categoryId == null) return;
 
-    final isar = await ref.read(isarProvider.future);
-    final category = await isar.categorys.get(widget.categoryId!);
-    
-    if (category != null && mounted) {
-      _nameController.text = category.name;
-      _selectedIcon = category.iconName;
-      _selectedColor = category.colorValue;
-      setState(() {});
+    try {
+      final repo = ref.read(categoryRepositoryProvider);
+      final category = await repo.getById(widget.categoryId!);
+      
+      if (category != null && mounted) {
+        _nameController.text = category.name;
+        _selectedIcon = category.iconName;
+        _selectedColor = category.colorValue;
+        setState(() {});
+      }
+    } catch (e) {
+      debugPrint('Error loading category: $e');
     }
   }
 
@@ -94,7 +97,6 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
 
     try {
       final repo = ref.read(categoryRepositoryProvider);
-      final isar = await ref.read(isarProvider.future);
       
       // Get max sort order for new categories
       int sortOrder = 0;
@@ -102,7 +104,7 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
         final categories = await repo.getAll();
         sortOrder = categories.isEmpty ? 0 : categories.map((c) => c.sortOrder).reduce((a, b) => a > b ? a : b) + 1;
       } else {
-        final existing = await isar.categorys.get(widget.categoryId!);
+        final existing = await repo.getById(widget.categoryId!);
         sortOrder = existing?.sortOrder ?? 0;
       }
 

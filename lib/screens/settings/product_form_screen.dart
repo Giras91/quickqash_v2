@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/item.dart';
+import '../../models/category.dart';
 import '../../repositories/repositories.dart';
+
+// Provider for watching categories
+final categoriesStreamProvider = StreamProvider<List<Category>>((ref) {
+  final repo = ref.watch(categoryRepositoryProvider);
+  return repo.watchAll();
+});
 
 class ProductFormScreen extends ConsumerStatefulWidget {
   final String? productId;
@@ -135,7 +142,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categoriesAsync = ref.watch(ref.watch(categoryRepositoryProvider).watchAll() as dynamic);
+    final categoriesAsync = ref.watch(categoriesStreamProvider);
 
     return Scaffold(
       appBar: AppBar(

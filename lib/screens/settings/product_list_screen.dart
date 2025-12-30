@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/item.dart';
+import '../../models/category.dart';
 import '../../repositories/repositories.dart';
 import '../../widgets/shared/category_tabs.dart';
 
 // Provider that watches products collection and returns list
 final productsProvider = StreamProvider<List<Item>>((ref) {
   final repo = ref.watch(itemRepositoryProvider);
+  return repo.watchAll();
+});
+
+// Provider that watches categories
+final productListCategoriesProvider = StreamProvider<List<Category>>((ref) {
+  final repo = ref.watch(categoryRepositoryProvider);
   return repo.watchAll();
 });
 
@@ -92,7 +99,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   @override
   Widget build(BuildContext context) {
     final filteredProductsAsync = ref.watch(filteredProductsProvider);
-    final categoriesAsync = ref.watch(ref.watch(categoryRepositoryProvider).watchAll() as dynamic);
+    final categoriesAsync = ref.watch(productListCategoriesProvider);
     final selectedCategory = ref.watch(selectedProductCategoryProvider);
 
     return Scaffold(

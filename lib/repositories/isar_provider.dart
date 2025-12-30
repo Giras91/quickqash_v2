@@ -7,6 +7,7 @@ import '../models/order.dart';
 import '../models/order_item.dart';
 import '../models/payment.dart';
 import '../models/printer.dart';
+import '../models/inventory_log.dart';
 import '../services/seed_service.dart';
 
 /// Provider for production Isar instance
@@ -20,6 +21,7 @@ final isarProvider = FutureProvider<Isar>((ref) async {
       OrderItemSchema,
       PaymentSchema,
       PrinterSchema,
+      InventoryLogSchema,
     ],
     directory: dir.path,
     name: 'quickqash',
@@ -42,6 +44,7 @@ final trainingIsarProvider = FutureProvider<Isar>((ref) async {
       OrderItemSchema,
       PaymentSchema,
       PrinterSchema,
+      InventoryLogSchema,
     ],
     directory: dir.path,
     name: 'quickqash_training',

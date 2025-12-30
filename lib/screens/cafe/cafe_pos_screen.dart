@@ -22,6 +22,18 @@ class _CafePosScreenState extends ConsumerState<CafePosScreen> {
   late TextEditingController _searchController;
   int _selectedCategory = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   void _addToOrder(Item item) {
     ref.read(cartProvider.notifier).addItem(
       itemId: item.id.toString(),

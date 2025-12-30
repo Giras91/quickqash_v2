@@ -29,17 +29,31 @@ flutter run -d windows
 
 ## Current Status
 
-- App scaffold with mode selection (Retail, Cafe, Restaurant)
-- Global Training toggle and banner indicator
-- Placeholder POS screens per mode
-- Printer abstraction and basic ESC/POS kitchen ticket builder
+✅ **Completed:**
+- Three POS modes (Retail, Cafe, Restaurant) with mode-specific UX
+- Isar database with training vs production isolation
+- Product management (add/edit/delete) with categories
+- Barcode scanning and search across all modes
+- Shopping cart with modifiers and quick checkout
+- Payment processing (Cash/Card) with order history
+- Kitchen printer support (Network, Bluetooth, USB, Sunmi)
+- Printer discovery and configuration UI
+- Kitchen ticket generation (ESC/POS, 80mm/58mm paper)
+- Daily/Weekly/Monthly sales reports by POS mode
+- **Inventory tracking** with real-time stock levels, low-stock alerts, and complete audit trail
+- Automatic inventory decrement on checkout
+- Training mode banner and data isolation
 
-## Roadmap
+⏭️ **Next Phase:**
+- Multi-unit conversions (boxes → pieces)
+- Supplier management and purchase orders
+- Inventory forecasting and trend analysis
+- Advanced reorder automation
 
-- Local storage (Isar/Drift) with training vs production isolation
-- Kitchen printer configuration UI and LAN printing (TCP 9100)
-- Transaction engine (orders, payments, taxes, discounts)
-- Mode-specific UX (modifiers, tables, quick checkout)
+## Documentation
+
+- **[INVENTORY_IMPLEMENTATION.md](INVENTORY_IMPLEMENTATION.md)** - Complete inventory system overview
+- **[INVENTORY_TESTING.md](INVENTORY_TESTING.md)** - Comprehensive testing guide with 50+ test cases
 
 ## Printing Notes
 

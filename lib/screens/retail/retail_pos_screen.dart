@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/item.dart';
+import '../../models/category.dart';
 import '../../repositories/repositories.dart';
 import '../../widgets/shared/cart_panel.dart';
 import '../../widgets/shared/category_tabs.dart';
@@ -42,9 +43,8 @@ class _RetailPosScreenState extends ConsumerState<RetailPosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categoriesAsync = ref.watch(ref.watch(categoryRepositoryProvider).watchAll() as dynamic);
-    final itemsAsync = ref.watch(ref.watch(itemRepositoryProvider).watchAll() as dynamic);
-    final itemRepo = ref.watch(itemRepositoryProvider);
+    final categoriesAsync = ref.watch(retailCategoriesProvider);
+    final itemsAsync = ref.watch(retailItemsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -99,6 +99,7 @@ class _RetailPosScreenState extends ConsumerState<RetailPosScreen> {
                     onSubmitted: (barcode) async {
                       if (barcode.trim().isEmpty) return;
                       final messenger = ScaffoldMessenger.of(context);
+                      final itemRepo = ref.read(itemRepositoryProvider);
                       final found = await itemRepo.getByBarcode(barcode.trim());
                       if (found != null) {
                         _addToCart(found);
@@ -221,3 +222,14 @@ class _RetailPosScreenState extends ConsumerState<RetailPosScreen> {
     );
   }
 }
+
+// Stream providers for Retail POS data
+final retailCategoriesProvider = StreamProvider<List<Category>>((ref) {
+  final repo = ref.watch(categoryRepositoryProvider);
+  return repo.watchAll();
+});
+
+final retailItemsProvider = StreamProvider<List<Item>>((ref) {
+  final repo = ref.watch(itemRepositoryProvider);
+  return repo.watchAll();
+});
